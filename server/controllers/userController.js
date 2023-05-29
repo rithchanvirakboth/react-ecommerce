@@ -137,9 +137,36 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 // @route PUT /api/users/profile
 // @access Private
 
-// export const updateUserProfile = asyncHandler(async (req, res) => {
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
-// });
+  if(user){
+    user.lastname = req.body.lastname || user.lastname;
+    user.firstname = req.body.firstname || user.firstname;
+    user.username = req.body.username || user.username;
+    user.email = req.body.email || user.email;
+    user.birthdate = req.body.birthdate || user.birthdate;
+
+    if(req.body.password){
+      user.password = req.body.password;
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      lastname: updatedUser.lastname,
+      firstname: updatedUser.firstname,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      birthdate: updatedUser.birthdate,
+    });
+  }
+  else{
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
 
 // @desc Get all users
 // @route GET /api/users
