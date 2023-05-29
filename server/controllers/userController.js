@@ -28,3 +28,68 @@ export const loginAuth = asyncHandler(async (req, res) => {
     throw new Error("Invalid email or password");
   }
 });
+
+// @desc Register a new user
+// @route POST /api/users
+// @access Public
+
+export const registerUser = asyncHandler(async (req, res) => {
+  const {
+    lastname,
+    firstname,
+    username,
+    email,
+    password,
+    confirmPassword,
+    birthdate,
+  } = req.body;
+
+  const userExists = await User.findOne({
+    email,
+  });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  const userName = await User.findOne({
+    username,
+  });
+
+  if (userName) {
+    res.status(400);
+    throw new Error("Username already exists");
+  }
+
+  if (password !== confirmPassword) {
+    res.status(400);
+    throw new Error("Passwords do not match");
+  }
+
+  const user = await User.create({
+    lastname,
+    firstname,
+    username,
+    email,
+    password,
+    birthdate,
+  });
+
+  if (user) {
+    generateToken(res, user._id);
+
+    res.status(201).json({
+      _id: user._id,
+      lastname: user.lastname,
+      firstname: user.firstname,
+      username: user.username,
+      email: user.email,
+      birthdate: user.birthdate,
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
+});
+

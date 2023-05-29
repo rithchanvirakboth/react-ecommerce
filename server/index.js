@@ -2,6 +2,7 @@ import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import databaseConnection from "./config/database.js";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/userRoute.js";
@@ -31,5 +32,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));
